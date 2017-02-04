@@ -260,9 +260,9 @@ function receivedMessage(event) {
 
     // Make sure valid URL & article  
     if (validUrl.isUri(messageText)){
-        og(url, function(err, meta){
-          console.log(meta);
-
+        og(messageText, function(err, meta){
+          console.log("META:")
+          console.log(meta)
           if (meta["type"] == "article"){
             getCredibilityReport(senderID, articleURL);
           } else {
