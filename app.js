@@ -264,7 +264,7 @@ function receivedMessage(event) {
           console.log("META:")
           console.log(meta)
           if (meta["type"] == "article"){
-            getCredibilityReport(senderID, articleURL);
+            getCredibilityReport(senderID, messageText);
           } else {
             sendTextMessage(senderID, "That's not an article!");
           }
@@ -274,8 +274,6 @@ function receivedMessage(event) {
     }
 
 
-  } else if (messageAttachments) {
-    sendTextMessage(senderID, "Message with attachment received");
   }
 }
 
