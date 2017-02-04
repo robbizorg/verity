@@ -10,6 +10,38 @@
 /* jshint node: true, devel: true */
 'use strict';
 
+var pubs = {
+  "breitbart.com": "0",
+  "huffingtonpost.com": "100",
+  "nytimes.com": "75",
+  "abcnews.go.com/": "55",
+  "abcnews.com/": "55",
+  "foxnews.com": "30",
+  "npr.org": "75",
+  "bbc.com": "65",
+  "msnbc.com": "65",
+  "theguardian.com": "80",
+  "hannity.com": "10",
+  "rushlimbaugh.com": "10",
+  "theblaze.com": "15",
+  "cnn.com": "60",
+  "drudgereport.com": "20",
+  "aljazeera.com": "70",
+  "wsj.com": "55",
+  "cbs.com": "55",
+  "economist.com": "65",
+  "buzzfeed.com": "65",
+  "pbs.org": "65",
+  "slate.com": "90",
+  "independent.co.uk": "85",
+  "theverge.com": "85",
+  "usatoday.com": "60",
+  "yahoo.com": "50",
+  "google.com": "55",
+  "dailymail.co.uk": "40"
+}
+
+
 const 
   bodyParser = require('body-parser'),
   config = require('config'),
@@ -18,7 +50,8 @@ const
   https = require('https'),  
   request = require('request'),
   og = require('open-graph'),
-  validUrl = require('valid-url');
+  validUrl = require('valid-url'),
+  unirest = require('unirest');
 
 var app = express();
 app.set('port', process.env.PORT || 8000);
@@ -290,7 +323,7 @@ function getCredibilityReport(senderID, articleURL){
         buttons:[{
           type: "postback",
           title: "Show Different Viewpoints",
-          payload: articleURL
+          payload: ",,," + articleURL
         },
         {
           type: "postback",
@@ -352,6 +385,62 @@ function receivedPostback(event) {
   console.log("Received postback for user %d and page %d with payload '%s' " + 
     "at %d", senderID, recipientID, payload, timeOfPostback);
 
+
+  if (payload.indexOf(",,,") != -1){
+    articleURL = payload.substring(3, payload.length - 1);
+    unirest.get("http://webhose.io/search?token=7154c102-1523-475e-bda7-dcdf4901e5cb&format=json&q=Gorsuch")
+    .header("Accept", "JSON")
+    .end(function (result) {
+      posts = result.body;
+
+
+
+      var firstArticle = posts[0].thread;
+
+
+
+      var articles = message: {
+      attachment: {
+        type: "template",
+        payload: {
+          template_type: "generic",
+          elements: [{
+            title: firstArticle.title,
+            subtitle: firstArticle.section_title,
+            item_url: firstArticle.url,               
+            // image_url: SERVER_URL + "/assets/rift.png",
+            buttons: [{
+              type: "web_url",
+              url: firstArticle.url,
+              title: "Open"
+            }],
+          }]
+        }
+      }
+      }
+
+      sendGenericMessage(senderID, articles)
+      
+
+
+
+
+        // for (post in posts){
+        //   for (pub in pubs) {
+        //     if (post.thread.site.includes(pub)) {
+        //       post.thread.bias = pubs[pub];
+        //     }
+        //   } 
+
+        //   // Not Found
+        //   if (!post.thread.bias) {
+        //     post.thread.bias = 50;
+        //   }
+        // }
+    });
+
+
+  }
   // When a postback is called, we'll send a message back to the sender to 
   // let them know it was successful
   sendTextMessage(senderID, "Postback called");
@@ -541,11 +630,11 @@ function sendButtonMessage(recipientId, object) {
  * Send a Structured Message (Generic Message type) using the Send API.
  *
  */
-function sendGenericMessage(recipientId, content) {
+function sendGenericMessage(recipientId, articles) {
   var messageData = {
     recipient: {
       id: recipientId
-    }, content
+    }, content: articles
     // message: {
     //   attachment: {
     //     type: "template",
