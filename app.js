@@ -290,7 +290,7 @@ function getCredibilityReport(senderID, articleURL){
         buttons:[{
           type: "postback",
           title: "Show Different Viewpoints",
-          payload: "DEVELOPER_DEFINED_PAYLOAD"
+          payload: articleURL
         },
         {
           type: "postback",
