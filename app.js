@@ -17,6 +17,8 @@ const
   express = require('express'),
   https = require('https'),  
   request = require('request');
+  og = require('open-graph');
+  validUrl = require('valid-url');
 
 var app = express();
 app.set('port', process.env.PORT || 8000);
@@ -254,66 +256,55 @@ function receivedMessage(event) {
     // If we receive a text message, check to see if it matches any special
     // keywords and send back the corresponding example. Otherwise, just echo
     // the text we received.
-    switch (messageText) {
-      case 'image':
-        sendImageMessage(senderID);
-        break;
 
-      case 'gif':
-        sendGifMessage(senderID);
-        break;
 
-      case 'audio':
-        sendAudioMessage(senderID);
-        break;
+    // Make sure valid URL & article  
+    if (validUrl.isUri(messageText)){
+        og(url, function(err, meta){
+          console.log(meta);
 
-      case 'video':
-        sendVideoMessage(senderID);
-        break;
-
-      case 'file':
-        sendFileMessage(senderID);
-        break;
-
-      case 'button':
-        sendButtonMessage(senderID);
-        break;
-
-      case 'generic':
-        sendGenericMessage(senderID);
-        break;
-
-      case 'receipt':
-        sendReceiptMessage(senderID);
-        break;
-
-      case 'quick reply':
-        sendQuickReply(senderID);
-        break;        
-
-      case 'read receipt':
-        sendReadReceipt(senderID);
-        break;        
-
-      case 'typing on':
-        sendTypingOn(senderID);
-        break;        
-
-      case 'typing off':
-        sendTypingOff(senderID);
-        break;        
-
-      case 'account linking':
-        sendAccountLinking(senderID);
-        break;
-
-      default:
-        sendTextMessage(senderID, messageText);
+          if (meta["type"] == "article"){
+            getCredibilityReport(senderID, articleURL);
+          } else {
+            sendTextMessage(senderID, "That's not an article!");
+          }
+        })
+    } else {
+        sendTextMessage(senderID, "Oops! Please make sure you send an article and try again.");
     }
+
+
   } else if (messageAttachments) {
     sendTextMessage(senderID, "Message with attachment received");
   }
 }
+
+function getCredibilityReport(senderID, articleURL){
+
+  var biasDescription = "This article is biased as fuck bro idk what you're doing LMAO.";
+
+
+  sendButtonMessage(senderID, message: {
+    attachment: {
+      type: "template",
+      payload: {
+        template_type: "button",
+        text: biasDescription,
+        buttons:[{
+          type: "postback",
+          title: "Show Different Viewpoints",
+          payload: "DEVELOPER_DEFINED_PAYLOAD"
+        },
+        {
+          type: "postback",
+          title: "Discuss With Someone",
+          payload: "DEVELOPER_DEFINED_PAYLOAD"
+        }]
+      }
+    }
+    });
+}
+
 
 
 /*
@@ -541,28 +532,28 @@ function sendButtonMessage(recipientId) {
     recipient: {
       id: recipientId
     },
-    message: {
-      attachment: {
-        type: "template",
-        payload: {
-          template_type: "button",
-          text: "This is test text",
-          buttons:[{
-            type: "web_url",
-            url: "https://www.oculus.com/en-us/rift/",
-            title: "Open Web URL"
-          }, {
-            type: "postback",
-            title: "Trigger Postback",
-            payload: "DEVELOPER_DEFINED_PAYLOAD"
-          }, {
-            type: "phone_number",
-            title: "Call Phone Number",
-            payload: "+16505551234"
-          }]
-        }
-      }
-    }
+    // message: {
+    //   attachment: {
+    //     type: "template",
+    //     payload: {
+    //       template_type: "button",
+    //       text: "This is test text",
+    //       buttons:[{
+    //         type: "web_url",
+    //         url: "https://www.oculus.com/en-us/rift/",
+    //         title: "Open Web URL"
+    //       }, {
+    //         type: "postback",
+    //         title: "Trigger Postback",
+    //         payload: "DEVELOPER_DEFINED_PAYLOAD"
+    //       }, {
+    //         type: "phone_number",
+    //         title: "Call Phone Number",
+    //         payload: "+16505551234"
+    //       }]
+    //     }
+    //   }
+    // }
   };  
 
   callSendAPI(messageData);
@@ -572,47 +563,47 @@ function sendButtonMessage(recipientId) {
  * Send a Structured Message (Generic Message type) using the Send API.
  *
  */
-function sendGenericMessage(recipientId) {
+function sendGenericMessage(recipientId, content) {
   var messageData = {
     recipient: {
       id: recipientId
-    },
-    message: {
-      attachment: {
-        type: "template",
-        payload: {
-          template_type: "generic",
-          elements: [{
-            title: "rift",
-            subtitle: "Next-generation virtual reality",
-            item_url: "https://www.oculus.com/en-us/rift/",               
-            image_url: SERVER_URL + "/assets/rift.png",
-            buttons: [{
-              type: "web_url",
-              url: "https://www.oculus.com/en-us/rift/",
-              title: "Open Web URL"
-            }, {
-              type: "postback",
-              title: "Call Postback",
-              payload: "Payload for first bubble",
-            }],
-          }, {
-            title: "touch",
-            subtitle: "Your Hands, Now in VR",
-            item_url: "https://www.oculus.com/en-us/touch/",               
-            image_url: SERVER_URL + "/assets/touch.png",
-            buttons: [{
-              type: "web_url",
-              url: "https://www.oculus.com/en-us/touch/",
-              title: "Open Web URL"
-            }, {
-              type: "postback",
-              title: "Call Postback",
-              payload: "Payload for second bubble",
-            }]
-          }]
-        }
-      }
+    }, content
+    // message: {
+    //   attachment: {
+    //     type: "template",
+    //     payload: {
+    //       template_type: "generic",
+    //       elements: [{
+    //         title: "rift",
+    //         subtitle: "Next-generation virtual reality",
+    //         item_url: "https://www.oculus.com/en-us/rift/",               
+    //         image_url: SERVER_URL + "/assets/rift.png",
+    //         buttons: [{
+    //           type: "web_url",
+    //           url: "https://www.oculus.com/en-us/rift/",
+    //           title: "Open Web URL"
+    //         }, {
+    //           type: "postback",
+    //           title: "Call Postback",
+    //           payload: "Payload for first bubble",
+    //         }],
+    //       }, {
+    //         title: "touch",
+    //         subtitle: "Your Hands, Now in VR",
+    //         item_url: "https://www.oculus.com/en-us/touch/",               
+    //         image_url: SERVER_URL + "/assets/touch.png",
+    //         buttons: [{
+    //           type: "web_url",
+    //           url: "https://www.oculus.com/en-us/touch/",
+    //           title: "Open Web URL"
+    //         }, {
+    //           type: "postback",
+    //           title: "Call Postback",
+    //           payload: "Payload for second bubble",
+    //         }]
+    //       }]
+    //     }
+    //   }
     }
   };  
 
