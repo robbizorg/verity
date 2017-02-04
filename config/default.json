@@ -1,6 +1,6 @@
 {
     "appSecret": "c7cc1456e22279decabe422bdb5e4da5",
-    "pageAccessToken": "TBD",
+    "pageAccessToken": "EAAaqTuWRV2cBANdklZCglnn7S7IcugDFhxb0a3kbVZAFPLIeSu3MW68wxbcWlSXYhqX7sBRfE849vBTH83Wr53ExApFaCZAu3OIplVYeMt9vh4mgQA8vVRPaL0ZA9k7kd7tO1OxDG99HjNxGI0vbvZAv5aZCTxdsITM83ZCfwCGwAZDZD",
     "validationToken": "devfest_yolo",
     "serverURL": "https://quiet-fortress-53366.herokuapp.com/"
 }
