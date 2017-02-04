@@ -16,8 +16,8 @@ const
   crypto = require('crypto'),
   express = require('express'),
   https = require('https'),  
-  request = require('request');
-  og = require('open-graph');
+  request = require('request'),
+  og = require('open-graph'),
   validUrl = require('valid-url');
 
 var app = express();
@@ -283,8 +283,7 @@ function getCredibilityReport(senderID, articleURL){
 
   var biasDescription = "This article is biased as fuck bro idk what you're doing LMAO.";
 
-
-  sendButtonMessage(senderID, message: {
+  var content = {
     attachment: {
       type: "template",
       payload: {
@@ -302,7 +301,10 @@ function getCredibilityReport(senderID, articleURL){
         }]
       }
     }
-    });
+    };
+
+  sendButtonMessage(senderID, {'message': content}); 
+
 }
 
 
@@ -604,7 +606,7 @@ function sendGenericMessage(recipientId, content) {
     //       }]
     //     }
     //   }
-    }
+    
   };  
 
   callSendAPI(messageData);
