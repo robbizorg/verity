@@ -399,7 +399,7 @@ function receivedPostback(event) {
 
 
 
-      var articles = message: {
+      var articles = {
       attachment: {
         type: "template",
         payload: {
