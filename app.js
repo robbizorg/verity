@@ -301,7 +301,7 @@ function getCredibilityReport(senderID, articleURL){
     }
     };
 
-  sendButtonMessage(senderID, {'message': content}); 
+  sendButtonMessage(senderID, content); 
 
 }
 
@@ -531,7 +531,7 @@ function sendButtonMessage(recipientId, object) {
   var messageData = {
     recipient: {
       id: recipientId
-    }, object
+    }, message: object
   };  
 
   callSendAPI(messageData);
